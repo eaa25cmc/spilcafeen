@@ -420,6 +420,24 @@ function renderSpilCard(spil, container) {
 
   const liked = isFavorite(spil);
 
+  // === Spillere ===
+  let playerText = "Ukendt";
+  if (spil.players) {
+    if (typeof spil.players === "object") {
+      const min = spil.players.min || spil.players.minimum || "";
+      const max = spil.players.max || spil.players.maximum || "";
+      if (min && max && min !== max) {
+        playerText = `${min}–${max}`;
+      } else if (min) {
+        playerText = `${min}`;
+      } else {
+        playerText = "Ukendt";
+      }
+    } else {
+      playerText = spil.players;
+    }
+  }
+
   const html = `
    <article class="spil-card" tabindex="0">
      <img src="${liked ? "img/fyldthjerte.png" : "img/tomthjerte.svg"}"
@@ -439,7 +457,7 @@ function renderSpilCard(spil, container) {
 
       <p><strong>Genre:</strong> ${escapeHtml(genreLabel)}</p>
       <p><strong>Spilletid:</strong> ${escapeHtml(playtime)}</p>
-      <p><strong>Spillere:</strong> ${escapeHtml(players)}</p>
+       <p><strong>Spillere:</strong> ${playerText}</p>
       <p class="description">${escapeHtml(desc)}</p>
       <button class="details-btn" type="button">Læs mere</button>
     </div>
