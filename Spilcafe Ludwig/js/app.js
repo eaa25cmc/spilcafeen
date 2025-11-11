@@ -503,33 +503,59 @@ function renderSpilCard(spil, container) {
 
 function showSpilModal(spil) {
   const dialog = document.querySelector("#spil-dialog");
-  const content = document.querySelector("#dialog-content");
-  if (!dialog || !content) return;
-  const imageHtml = spil.image
-    ? `<img src="${escapeHtml(spil.image)}" class="spil-poster">`
-    : "";
-  const genreText = Array.isArray(spil.genre)
-    ? spil.genre.join(", ")
-    : spil.genre
-    ? String(spil.genre)
-    : "-";
-  content.innerHTML = `
-   ${imageHtml}
-   <div class="dialog-details">
-     <h2>${escapeHtml(spil.title ?? spil.name ?? "Untitled")}</h2>
-     <p><strong>Genre:</strong> ${escapeHtml(genreText)}</p>
-     <p>${escapeHtml(spil.description ?? "")}</p>
-   </div>
- `;
-  const closeBtn = dialog.querySelector("#close-dialog");
-  if (closeBtn) {
-    closeBtn.replaceWith(closeBtn.cloneNode(true));
-    dialog
-      .querySelector("#close-dialog")
-      .addEventListener("click", () => dialog.close(), { once: true });
+  const content = dialog.querySelector("#dialog-content");
+
+  // Byg HTML til modal
+  let playerText = "Ukendt";
+  if (spil.players) {
+    if (typeof spil.players === "object") {
+      const min = spil.players.min || spil.players.minimum || "";
+      const max = spil.players.max || spil.players.maximum || "";
+      if (min && max && min !== max) {
+        playerText = `${min}–${max}`;
+      } else if (min) {
+        playerText = `${min}`;
+      }
+    } else {
+      playerText = spil.players;
+    }
   }
-  if (typeof dialog.showModal === "function") dialog.showModal();
-  else dialog.setAttribute("open", "");
+
+  // Dynamisk udskriv ALLE felter fra JSON
+  let extraInfo = "";
+  for (const [key, value] of Object.entries(spil)) {
+    if (
+      [
+        "title",
+        "image",
+        "desc",
+        "players",
+        "rating",
+        "genreLabel",
+        "playtime",
+      ].includes(key)
+    )
+      continue; // disse vises særskilt nedenfor
+    extraInfo += `<p><strong>${key}:</strong> ${escapeHtml(String(value))}</p>`;
+  }
+
+  // Indsæt HTML i modal
+  content.innerHTML = `
+    <img src="${escapeHtml(spil.image)}" alt="${escapeHtml(
+    spil.title
+  )}" style="width:100%;max-width:400px;border-radius:10px;">
+    <div>
+      <h2>${escapeHtml(spil.title)}</h2>
+      <p><strong>Rating:</strong> ${escapeHtml(spil.rating)}</p>
+      <p><strong>Genre:</strong> ${escapeHtml(spil.genreLabel)}</p>
+      <p><strong>Spilletid:</strong> ${escapeHtml(spil.playtime)}</p>
+      <p><strong>Spillere:</strong> ${playerText}</p>
+      <p><strong>Beskrivelse:</strong> ${escapeHtml(spil.desc)}</p>
+      ${extraInfo}
+    </div>
+  `;
+
+  dialog.showModal();
 }
 
 /* ---------- Utilities ---------- */
