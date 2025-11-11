@@ -24,8 +24,7 @@
   --radius: 1rem;
   --transition: 250ms ease;
   /* Sticky footer: reserver plads og fastgør footer til bunden */
-   --footer-height: 64px;
-   
+  --footer-height: 64px;
 }
 
 /* =====================
@@ -39,17 +38,17 @@
 
 /* HER ÆNDRER VI BAGGRUNDEN */
 body {
- font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial,
-   sans-serif;
- font-size: 1rem;
- line-height: 1.6;
- background-image: url("img/Frame\ 284.png");
- background-size: 190%;
- background-position: center 80px;
- background-repeat: no-repeat;
- background-attachment: fixed;
- color: var(--text);
- min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial,
+    sans-serif;
+  font-size: 1rem;
+  line-height: 1.6;
+  background-image: url("img/Frame\ 284.png");
+  background-size: 190%;
+  background-position: center 80px;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  color: var(--text);
+  min-height: 100vh;
 }
 
 /* =====================
@@ -59,12 +58,12 @@ main {
   max-width: min(1400px, 95vw);
   margin: 0 auto;
   padding: clamp(5rem, 10vw, 8rem) 1rem 2rem;
-   /* behold eksisterende paddings, men sørg for ekstra plads i bunden */
+  /* behold eksisterende paddings, men sørg for ekstra plads i bunden */
   padding-bottom: calc(2rem + var(--footer-height));
 }
 
 header {
-  position:sticky;
+  position: sticky;
   top: 0;
   left: 0;
   width: 100%;
@@ -118,7 +117,6 @@ header .favoritterknap:hover img {
   scroll-margin-top: 100px; /* juster efter headerens højde */
   scroll-behavior: smooth;
   margin: -10px 0 0 0; /* juster efter headerens højde */
-
 }
 
 /* fjern link-styling for skip-to-top */
@@ -135,7 +133,22 @@ header .favoritterknap:hover img {
 /* =====================
    FILTERBAR STYLES
    ===================== */
-.filterbar {    
+
+/* Gør knapperne til en række */
+.filters-header {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.4rem; /* meget lille afstand mellem knapperne */
+  margin-bottom: 0.75rem;
+}
+
+/* fjern auto-margin fra clear-knappen */
+#clear-filters {
+  display: none; /* skjult fra start */
+}
+
+.filterbar {
   display: flex;
   flex-wrap: wrap;
   gap: 1rem;
@@ -157,13 +170,13 @@ header .favoritterknap:hover img {
   border: 2px solid var(--primary);
   border-radius: var(--radius);
   font-size: 1rem;
-}   
+}
 
 #search-bar {
   max-width: 400px;
   display: flex;
   align-items: center;
-  justify-content: space-between; /* Ikoner ud til hver side */;
+  justify-content: space-between; /* Ikoner ud til hver side */
 }
 
 .search-bar {
@@ -176,7 +189,6 @@ header .favoritterknap:hover img {
 #genre-select {
   max-width: 200px;
 }
-
 
 /* STYLING AF FILTER-BAR */
 #search-input,
@@ -194,7 +206,7 @@ header .favoritterknap:hover img {
 
 /* RYD KNAP */
 .clear-btn {
-  background:darkred;
+  background: darkred;
   color: white;
   border: none;
   border-radius: var(--radius);
@@ -222,7 +234,7 @@ header .favoritterknap:hover img {
 }
 
 #clear-filters:hover {
-  background:#D6746B;
+  background: #d6746b;
   color: white;
   transform: scale(1.1);
 }
@@ -240,7 +252,7 @@ header .favoritterknap:hover img {
   transition: var(--transition);
 }
 .clear-filter:hover {
-  background:#D6746B;
+  background: #d6746b;
   color: white;
   transform: scale(1.1);
 }
@@ -261,7 +273,7 @@ header .favoritterknap:hover img {
 
 .filters-toggle:hover {
   transform: scale(1.05);
-} 
+}
 
 /* Collapsed panel (skjult) */
 #filters-panel.collapsed {
@@ -334,27 +346,24 @@ header .favoritterknap:hover img {
   padding: 30px;
 }
 .heart-icon {
- position: absolute;
- top: 8px;
- right: 8px;
- width: 24px; /* juster størrelsen som du vil */
- height: 24px;
- cursor: pointer;
- transition: transform 0.2s ease, opacity 0.2s ease;
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 24px; /* juster størrelsen som du vil */
+  height: 24px;
+  cursor: pointer;
+  transition: transform 0.2s ease, opacity 0.2s ease;
 }
-
 
 .heart-icon:hover {
- transform: scale(1.1);
- opacity: 0.8;
+  transform: scale(1.1);
+  opacity: 0.8;
 }
-
 
 .spil-card:focus {
-  outline:darkred;
+  outline: darkred;
   outline-offset: 2px;
 }
-
 
 .spil-poster {
   width: 100%;
@@ -381,11 +390,29 @@ header .favoritterknap:hover img {
   flex-direction: column;
   border-radius: 10px;
   border-style: solid;
-  background-color:whitesmoke;
+  background-color: whitesmoke;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.219);
   overflow: hidden;
   border: 2px solid darkred;
   width: 100%; /* fylder kolonnen */
+}
+
+/* indholdet under billedet skal kunne fylde ud */
+.spil-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  flex: 1; /* <– så det fylder resten af kortet */
+}
+
+/* beskrivelsen må gerne bruge pladsen */
+.spil-info .description {
+  flex: 1; /* <– fyld ud, så knappen kan blive i bunden */
+}
+
+/* knappen skal ned i bunden */
+.details-btn {
+  margin-top: auto;
 }
 
 /* Gør billedhøjden mindre når kortene står ved siden af hinanden */
@@ -407,18 +434,16 @@ header .favoritterknap:hover img {
 
 /* ...existing code... */
 
-
-
 .details-btn {
   margin-top: 8px;
   padding: 0.5rem 1rem;
-  background-color:whitesmoke;
-  color:#000101;
+  background-color: whitesmoke;
+  color: #000101;
   border: 2px solid darkred;
   border-color: darkred;
   border-radius: var(--radius);
   cursor: pointer;
-  font-size: 0,5rem;
+  font-size: 0, 5rem;
   transition: all 0.3s ease;
 }
 
@@ -434,13 +459,12 @@ header .favoritterknap:hover img {
 
 /* Make footer sticky to viewport bottom */
 
-
-
 /* Juster på små skærme hvis nødvendigt */
 @media (max-width: 480px) {
-  :root { --footer-height: 56px; }
+  :root {
+    --footer-height: 56px;
+  }
 }
-
 
 /* =====================
    Spil DIALOG
@@ -497,4 +521,12 @@ dialog#spil-dialog::backdrop {
   align-items: start;
   overflow-y: auto;
   max-height: 90vh;
+}
+
+/* Sørg for at alle kort i grid'et strækkes lige højt */
+.spil-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 2rem;
+  align-items: stretch; /* <– i stedet for start */
 }
