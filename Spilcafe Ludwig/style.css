@@ -395,6 +395,12 @@ header .favoritterknap:hover img {
   overflow: hidden;
   border: 2px solid darkred;
   width: 100%; /* fylder kolonnen */
+  cursor: pointer;
+}
+
+.spil-card:hover {
+  transform: scale(1.03);
+  box-shadow: #212223 0px 4px 20px;
 }
 
 /* indholdet under billedet skal kunne fylde ud */
