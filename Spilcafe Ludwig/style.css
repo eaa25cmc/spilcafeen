@@ -38,8 +38,7 @@
 
 /* HER ÆNDRER VI BAGGRUNDEN */
 body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial,
-    sans-serif;
+  font-family: poppins, sans-serif;
   font-size: 1rem;
   line-height: 1.6;
   background-image: url("img/Frame\ 284.png");
