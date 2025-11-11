@@ -170,6 +170,13 @@ header .favoritterknap:hover img {
   border: 2px solid var(--primary);
   border-radius: var(--radius);
   font-size: 1rem;
+  cursor: pointer;
+}
+
+.filterbar input,
+.filterbar select :hover {
+  transform: scale(1.02);
+  box-shadow: var(--shadow);
 }
 
 #search-bar {
@@ -186,13 +193,8 @@ header .favoritterknap:hover img {
   margin-top: 1rem;
 }
 
-#genre-select {
-  max-width: 200px;
-}
-
 /* STYLING AF FILTER-BAR */
 #search-input,
-#genre-select,
 #sort-select {
   background: white;
   color: var(--text);
