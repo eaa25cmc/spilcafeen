@@ -405,6 +405,39 @@ header .favoritterknap:hover img {
   flex: 1; /* <– så det fylder resten af kortet */
 }
 
+/* =====================
+   SPIL HEADER (titel + rating + stjerne)
+   ===================== */
+.spil-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* Titel til venstre, rating til højre */
+  margin-bottom: 0.5rem;
+}
+
+.spil-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.spil-rating-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.spil-rating {
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.stjerne-icon {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+}
+
 /* beskrivelsen må gerne bruge pladsen */
 .spil-info .description {
   flex: 1; /* <– fyld ud, så knappen kan blive i bunden */

@@ -428,17 +428,22 @@ function renderSpilCard(spil, container) {
      <img src="${escapeHtml(image)}"
           class="spil-poster"
           alt="Poster ${escapeHtml(title)}">
-     <div class="spil-info">
-       <h3>${escapeHtml(title)} <span class="spil-rating">(${escapeHtml(
-    rating
-  )})</span></h3>
-       <p><strong>Genre:</strong> ${escapeHtml(genreLabel)}</p>
-       <p><strong>Spilletid:</strong> ${escapeHtml(playtime)}</p>
-       <p><strong>Spillere:</strong> ${escapeHtml(players)}</p>
-       <p class="description">${escapeHtml(desc)}</p>
-       <button class="details-btn" type="button">Læs mere</button>
-     </div>
-   </article>
+    <div class="spil-info">
+      <div class="spil-header">
+        <h3 class="spil-title">${escapeHtml(title)}</h3>
+        <div class="spil-rating-wrapper">
+          <span class="spil-rating">${escapeHtml(rating)}</span>
+          <img src="img/stjerne.svg" alt="Stjerne" class="stjerne-icon">
+        </div>
+      </div>
+
+      <p><strong>Genre:</strong> ${escapeHtml(genreLabel)}</p>
+      <p><strong>Spilletid:</strong> ${escapeHtml(playtime)}</p>
+      <p><strong>Spillere:</strong> ${escapeHtml(players)}</p>
+      <p class="description">${escapeHtml(desc)}</p>
+      <button class="details-btn" type="button">Læs mere</button>
+    </div>
+  </article>
  `;
 
   container.insertAdjacentHTML("beforeend", html);
