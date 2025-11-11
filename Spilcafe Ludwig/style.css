@@ -205,44 +205,36 @@ header .favoritterknap:hover img {
   box-shadow: var(--shadow);
 }
 
-/* RYD KNAP */
-.clear-btn {
-  background: darkred;
-  color: white;
-  border: none;
+/* RYD alle filtre */
+.clear-filters {
+  width: 100%;
+  display: flex;
+  justify-content: flex-start;
+  margin-top: 1rem;
+}
+
+#clear-filters {
+  background: white;
+  color: var(--text);
+  border: 2px solid darkred;
   border-radius: var(--radius);
   padding: 0.75rem 1.5rem;
   font-size: 1rem;
   cursor: pointer;
   box-shadow: var(--shadow);
   transition: var(--transition);
-  display: flex;
-  align-items: right;
-}
-
-.clear-btn:hover {
-  background: var(--error);
-  color: white;
-  transform: scale(1.05);
-}
-
-#clear-filters {
-  margin-left: auto; /* Skub knappen til højre */
-  background: whitesmoke;
-  color: var(--text);
-  align-self: center;
-  margin-top: 0;
+  min-width: 120px;
 }
 
 #clear-filters:hover {
-  background: #d6746b;
-  color: white;
+  background: darkred;
   transform: scale(1.1);
 }
 
+/*krydsknappeer ved hver filtrering*/
 .clear-filter {
   margin-left: 0.5rem;
-  background: whitesmoke;
+
   color: var(--text);
   border: none;
   border-radius: var(--radius);
@@ -251,11 +243,6 @@ header .favoritterknap:hover img {
   cursor: pointer;
   box-shadow: var(--shadow);
   transition: var(--transition);
-}
-.clear-filter:hover {
-  background: #d6746b;
-  color: white;
-  transform: scale(1.1);
 }
 
 /* Toggle-knap */
