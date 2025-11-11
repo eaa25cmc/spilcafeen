@@ -1,0 +1,422 @@
+:root {
+  /* Colors */
+  --primary: #264c59;
+  --secondary: #acc6c9;
+  --primary-light: #42535c;
+  --secondary-light: #3c4043;
+
+  /* Text - Dark Mode Colors */
+  --text: #000101;
+  --text-light: #212223;
+
+  /* Backgrounds - Dark Mode */
+  --bg: #202124;
+  --bg-card: #3c4043;
+
+  /* Semantic */
+  --success: #34a853;
+  --warning: #fbc02d;
+  --error: #ea4335;
+
+  /* Effects */
+  --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.3);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.4);
+  --radius: 1rem;
+  --transition: 250ms ease;
+  /* Sticky footer: reserver plads og fastgør footer til bunden */
+  --footer-height: 64px;
+}
+
+/* =====================
+   GLOBAL STYLES
+   ===================== */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* HER ÆNDRER VI BAGGRUNDEN */
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial,
+    sans-serif;
+  font-size: 1rem;
+  line-height: 1.6;
+  background-image: url("img/logofacegentaget.png");
+  color: var(--text);
+  min-height: 100vh;
+}
+
+/* 2) Single image fill (cover) — én baggrund fylder hele elementet */
+.body-cover {
+  background-image: url("img/logofacegentaget.png");
+  background-repeat: repeat;
+  background-position: center;
+  background-size: cover; /* fylder elementet uden at strække proportioner */
+}
+
+/* =====================
+   LAYOUT (main container)
+   ===================== */
+main {
+  max-width: min(1400px, 95vw);
+  margin: 0 auto;
+  padding: clamp(5rem, 10vw, 8rem) 1rem 2rem;
+  /* behold eksisterende paddings, men sørg for ekstra plads i bunden */
+  padding-bottom: calc(2rem + var(--footer-height));
+}
+
+header {
+  position: sticky;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background-color: whitesmoke;
+  color: var(--text);
+  padding: 1rem 2rem;
+  box-shadow: var(--shadow);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 60vh;
+}
+
+#top {
+  scroll-margin-top: 100px; /* juster efter headerens højde */
+  scroll-behavior: smooth;
+  margin: -10px 0 0 0; /* juster efter headerens højde */
+}
+
+/* fjern link-styling for skip-to-top */
+.skip-to-top {
+  color: inherit;
+  text-decoration: none;
+  display: inline-block;
+}
+.skip-to-top:focus,
+.skip-to-top:hover {
+  text-decoration: none;
+}
+
+.favoritterknap:hover {
+  transform: scale(1.1);
+}
+
+/* =====================
+   FILTERBAR STYLES
+   ===================== */
+.filterbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  align-items: center;
+}
+
+.filterbar input,
+.filterbar select {
+  flex: 1;
+  min-width: 200px;
+  padding: 0.5rem 1rem;
+  border: 2px solid var(--primary);
+  border-radius: var(--radius);
+  font-size: 1rem;
+}
+
+#search-bar {
+  max-width: 400px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* Ikoner ud til hver side */
+}
+
+#genre-select {
+  max-width: 200px;
+}
+
+/* STYLING AF FILTER-BAR */
+#search-input,
+#genre-select,
+#sort-select {
+  background: white;
+  color: var(--text);
+  border: 1px solid var(--secondary);
+  border-radius: var(--radius);
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  transition: var(--transition);
+  box-shadow: var(--shadow);
+}
+
+/* RYD KNAP */
+.clear-btn {
+  background: darkred;
+  color: white;
+  border: none;
+  border-radius: var(--radius);
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+  transition: var(--transition);
+  display: flex;
+  align-items: right;
+}
+
+.clear-btn:hover {
+  background: var(--error);
+  color: white;
+  transform: scale(1.05);
+}
+
+#clear-filters {
+  margin-left: auto; /* Skub knappen til højre */
+  background: whitesmoke;
+  color: var(--text);
+}
+
+#clear-filters:hover {
+  background: #d6746b;
+  color: white;
+  transform: scale(1.1);
+}
+
+.clear-filter {
+  margin-left: 0.5rem;
+  background: whitesmoke;
+  color: var(--text);
+  border: none;
+  border-radius: var(--radius);
+  padding: 0.25rem 0.5rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+  transition: var(--transition);
+}
+.clear-filter:hover {
+  background: #d6746b;
+  color: white;
+  transform: scale(1.1);
+}
+
+/* Toggle-knap */
+.filters-toggle {
+  background: whitesmoke;
+  border: 2px solid darkred;
+  border-color: darkred;
+  padding: 1rem 2rem;
+  border-radius: 20px;
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0.75rem 0;
+  font-family: poppins, sans-serif;
+}
+
+.filters-toggle:hover {
+  transform: scale(1.05);
+}
+
+/* Collapsed panel (skjult) */
+#filters-panel.collapsed {
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: max-height 240ms ease, opacity 180ms ease;
+  padding-top: 0;
+  padding-bottom: 0;
+  pointer-events: none;
+}
+
+/* Open panel (synlig) */
+#filters-panel.open {
+  max-height: 800px; /* stor nok til indhold */
+  opacity: 1;
+  transition: max-height 320ms ease, opacity 220ms ease;
+  pointer-events: auto;
+  padding: 0.5rem 0;
+}
+
+/* Småjustering: gør filterbar til flex/grid som før */
+#filters-panel.filterbar,
+.filterbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.search-btn {
+  background: darkred;
+  color: white;
+  border: none;
+  border-radius: var(--radius);
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+  transition: var(--transition);
+  display: flex;
+  align-items: right;
+}
+
+/* =====================
+   SPIL CARD STYLES
+   ===================== */
+.spil-card {
+  display: flex;
+  flex-direction: column;
+  border-radius: 10px;
+  background-color: darkred;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.219);
+  overflow: hidden;
+  transition: transform 0.2s ease;
+  cursor: pointer;
+  border: solid darkred;
+  border-width: 2px;
+  padding: 30px;
+}
+
+/* Tilføj til din app.css */
+.spil-card {
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.spil-card:focus {
+  outline: darkred;
+  outline-offset: 2px;
+}
+
+.spil-poster {
+  width: 100%;
+  height: 400px;
+  object-fit: cover; /*(fylder hele kortets bredde og højde, beskærer om nødvendigt)*/
+  background: whitesmoke;
+  transition: transform 0.3s ease;
+}
+
+/* ...existing code... */
+
+/* SPIL GRID: vis to kort side om side */
+.spil-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr)); /* to kolonner */
+  gap: 2rem; /* afstand mellem kort */
+  align-items: start;
+  margin-top: 1.5rem;
+}
+
+/* Ret baggrundsfarven (manglede '#') og sørg for kort fylder sin grid-celle */
+.spil-card {
+  display: flex;
+  flex-direction: column;
+  border-radius: 10px;
+  border-style: outset;
+  background-color: whitesmoke;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.219);
+  overflow: hidden;
+  transition: transform 0.2s ease;
+  cursor: pointer;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  width: 100%; /* fylder kolonnen */
+}
+
+/* Gør billedhøjden mindre når kortene står ved siden af hinanden */
+@media (min-width: 700px) {
+  .spil-poster {
+    height: 220px;
+  }
+}
+
+/* Mobile: kun én kolonne */
+@media (max-width: 699px) {
+  .spil-grid {
+    grid-template-columns: 1fr;
+  }
+  .spil-poster {
+    height: 320px;
+  }
+}
+
+/* ...existing code... */
+
+.details-btn {
+  margin-top: 8px;
+  padding: 0.5rem 1rem;
+  background-color: whitesmoke;
+  color: #000101;
+  border: 2px solid darkred;
+  border-color: darkred;
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-size: 0, 5rem;
+  transition: background-color 0.3s ease;
+}
+
+/* Make footer sticky to viewport bottom */
+
+/* Juster på små skærme hvis nødvendigt */
+@media (max-width: 480px) {
+  :root {
+    --footer-height: 56px;
+  }
+}
+
+/* =====================
+   Spil DIALOG
+   ===================== */
+dialog#spil-dialog {
+  border: none;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lg);
+  padding: 0;
+  max-width: min(95vw, 1000px);
+  max-height: 90vh;
+  background: whitesmoke;
+  color: var(--text);
+  overflow: hidden;
+  position: relative;
+  margin: auto;
+}
+
+dialog#spil-dialog::backdrop {
+  background: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(8px);
+}
+
+#close-dialog {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--text-light);
+  border: none;
+  border-radius: 50%;
+  width: 2.5rem;
+  height: 2.5rem;
+  font-size: 1.25rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition);
+  z-index: 10;
+}
+
+#close-dialog:hover {
+  background: var(--error);
+  color: white;
+  transform: scale(1.1);
+}
+
+#dialog-content {
+  padding: 2rem;
+  display: grid;
+  grid-template-columns: minmax(250px, 1fr) 2fr;
+  gap: 2rem;
+  align-items: start;
+  overflow-y: auto;
+  max-height: 90vh;
+}
