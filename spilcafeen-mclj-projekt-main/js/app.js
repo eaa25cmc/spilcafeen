@@ -13,7 +13,8 @@ let allSpil = [];
 function norm(s) {
   return s === undefined || s === null ? "" : String(s).trim().toLowerCase();
 }
-
+// Escape HTML for sikker indsættelse
+// Bruges til at undgå XSS ved indsættelse af brugerdata i HTML
 function escapeHtml(str) {
   if (str === undefined || str === null) return "";
   return String(str)
@@ -109,6 +110,145 @@ function bindUI() {
   });
 }
 
+// Opret top 10 carousel
+function createTop10Carousel() {
+  const SPEED_PX_PER_SEC = 40; // juster hastighed (px/s)
+  const top10 = [...allSpil]
+    .sort((a, b) => (b.rating || 0) - (a.rating || 0))
+    .slice(0, 10);
+  if (!top10.length) return;
+
+  const existing = document.querySelector("#top-carousel");
+  if (existing) existing.remove();
+
+  const container = document.createElement("section");
+  container.id = "top-carousel";
+  container.className = "carousel";
+
+  container.innerHTML = `
+    <h2 class="carousel-title">Top 10</h2>
+    <div class="carousel-viewport" tabindex="0" aria-roledescription="carousel">
+      <div class="carousel-track"></div>
+    </div>
+  `;
+
+  const track = container.querySelector(".carousel-track");
+  const viewport = container.querySelector(".carousel-viewport");
+
+  for (const s of top10) {
+    const title = s.title || s.name || "Untitled";
+    const img = s.image || s.image_url || "";
+    const rating = s.rating ?? "N/A";
+    const card = document.createElement("article");
+    card.className = "carousel-card";
+    card.innerHTML = `
+      <img src="${escapeHtml(img)}" alt="${escapeHtml(
+      title
+    )}" class="carousel-poster">
+      <div class="carousel-info">
+        <h4>${escapeHtml(title)}</h4>
+        <div class="carousel-meta">⭐ ${escapeHtml(String(rating))}</div>
+      </div>
+    `;
+    card.addEventListener("click", () => showSpilModal(s));
+    track.appendChild(card);
+  }
+
+  // ensure container inserted into DOM
+  const spilList = document.querySelector("#spil-list");
+  if (spilList) spilList.before(container);
+  else document.querySelector("main").prepend(container);
+
+  // Duplicate children to enable seamless loop
+  const originalChildren = Array.from(track.children);
+  for (const child of originalChildren) {
+    const clone = child.cloneNode(true);
+    // keep click handler for modal by delegation to cloned content
+    track.appendChild(clone);
+  }
+
+  // wait for images to load before measuring
+  const imgs = Array.from(track.querySelectorAll("img"));
+  const imgPromises = imgs.map((img) =>
+    img.complete
+      ? Promise.resolve()
+      : new Promise((res) => img.addEventListener("load", res, { once: true }))
+  );
+
+  Promise.all(imgPromises).then(() => {
+    track.style.display = "flex";
+    track.style.gap = getComputedStyle(track).gap || "1rem";
+    track.style.willChange = "transform";
+
+    // measure width of one loop (original set)
+    const originalWidth =
+      originalChildren.reduce((sum, el) => {
+        const r = el.getBoundingClientRect();
+        return sum + r.width;
+      }, 0) +
+      (originalChildren.length - 1) *
+        parseFloat(getComputedStyle(track).gap || "0");
+
+    // if zero width fallback
+    const loopWidth =
+      originalWidth > 0 ? originalWidth : track.scrollWidth / 2 || 800;
+
+    let offset = 0;
+    let last = performance.now();
+    let paused = false;
+
+    function step(now) {
+      const dt = (now - last) / 1000;
+      last = now;
+      if (!paused) {
+        offset += SPEED_PX_PER_SEC * dt;
+        if (offset >= loopWidth) offset -= loopWidth;
+        track.style.transform = `translateX(${-offset}px)`;
+      }
+      requestAnimationFrame(step);
+    }
+
+    // pause/resume on hover & focus
+    container.addEventListener("mouseenter", () => (paused = true));
+    container.addEventListener("mouseleave", () => (paused = false));
+    viewport.addEventListener("focusin", () => (paused = true));
+    viewport.addEventListener("focusout", () => (paused = false));
+
+    // allow pointer drag to temporarily pause and nudge
+    let dragging = false;
+    let startX = 0;
+    let startOffset = 0;
+    viewport.addEventListener("pointerdown", (e) => {
+      dragging = true;
+      paused = true;
+      startX = e.clientX;
+      startOffset = offset;
+      viewport.setPointerCapture(e.pointerId);
+    });
+    viewport.addEventListener("pointermove", (e) => {
+      if (!dragging) return;
+      const dx = e.clientX - startX;
+      offset = startOffset - dx;
+      // wrap offset
+      offset = ((offset % loopWidth) + loopWidth) % loopWidth;
+      track.style.transform = `translateX(${-offset}px)`;
+    });
+    function endDrag(e) {
+      if (!dragging) return;
+      dragging = false;
+      paused = false;
+      viewport.releasePointerCapture?.(e?.pointerId);
+    }
+    viewport.addEventListener("pointerup", endDrag);
+    viewport.addEventListener("pointercancel", endDrag);
+    viewport.addEventListener("pointerleave", endDrag);
+
+    // start animation
+    last = performance.now();
+    requestAnimationFrame(step);
+  });
+}
+
 // Hent data
 async function getSpil() {
   try {
@@ -127,6 +267,9 @@ async function getSpil() {
     populateLocationSelect();
     populateDifficultySelect();
     populateAgeSelect();
+
+    // Opret karusellen før eller efter display — sørg for at kalde funktionen
+    createTop10Carousel();
 
     // Vis alt ved start
     displaySpil(allSpil);
@@ -446,22 +589,24 @@ function renderSpilCard(spil, container) {
      <img src="${escapeHtml(image)}"
           class="spil-poster"
           alt="Poster ${escapeHtml(title)}">
-    <div class="spil-info">
-      <div class="spil-header">
-        <h3 class="spil-title">${escapeHtml(title)}</h3>
-        <div class="spil-rating-wrapper">
-          <span class="spil-rating">${escapeHtml(rating)}</span>
-          <img src="img/stjerne.svg" alt="Stjerne" class="stjerne-icon">
-        </div>
-      </div>
+     <div class="spil-info">
+     <div class="spil-header">
+       <h3 class="spil-title">${escapeHtml(title)}</h3>
+       <div class="spil-rating-wrapper">
+         <span class="spil-rating">${escapeHtml(rating)}</span>
+         <img src="img/stjerne.svg" alt="Stjerne" class="stjerne-icon">
+       </div>
+     </div>
 
-      <p><strong>Genre:</strong> ${escapeHtml(genreLabel)}</p>
-      <p><strong>Spilletid:</strong> ${escapeHtml(playtime)}</p>
-       <p><strong>Spillere:</strong> ${playerText}</p>
-      <p class="description">${escapeHtml(desc)}</p>
-      <button class="details-btn" type="button">Læs mere</button>
-    </div>
-  </article>
+
+     <p><strong>Genre:</strong> ${escapeHtml(genreLabel)}</p>
+     <p><strong>Spilletid:</strong> ${escapeHtml(playtime)}</p>
+     <p><strong>Spillere:</strong> ${playerText}</p>
+     <p class="description">${escapeHtml(desc)}</p>
+     <button class="details-btn" type="button">Læs mere</button>
+   </div>
+ </article>
+
  `;
 
   container.insertAdjacentHTML("beforeend", html);
@@ -519,8 +664,11 @@ function showSpilModal(spil) {
     } else {
       playerText = spil.players;
     }
-  }
 
+    dialog
+      .querySelector("#close-dialog")
+      .addEventListener("click", () => dialog.close(), { once: true });
+  }
   // Dynamisk udskriv ALLE felter fra JSON
   let extraInfo = "";
   for (const [key, value] of Object.entries(spil)) {
@@ -541,19 +689,19 @@ function showSpilModal(spil) {
 
   // Indsæt HTML i modal
   content.innerHTML = `
-    <img src="${escapeHtml(spil.image)}" alt="${escapeHtml(
+   <img src="${escapeHtml(spil.image)}" alt="${escapeHtml(
     spil.title
   )}" style="width:100%;max-width:400px;border-radius:10px;">
-    <div>
-      <h2>${escapeHtml(spil.title)}</h2>
-      <p><strong>Rating:</strong> ${escapeHtml(spil.rating)}</p>
-      <p><strong>Genre:</strong> ${escapeHtml(spil.genreLabel)}</p>
-      <p><strong>Spilletid:</strong> ${escapeHtml(spil.playtime)}</p>
-      <p><strong>Spillere:</strong> ${playerText}</p>
-      <p><strong>Beskrivelse:</strong> ${escapeHtml(spil.desc)}</p>
-      ${extraInfo}
-    </div>
-  `;
+   <div>
+     <h2>${escapeHtml(spil.title)}</h2>
+     <p><strong>Rating:</strong> ${escapeHtml(spil.rating)}</p>
+     <p><strong>Genre:</strong> ${escapeHtml(spil.genreLabel)}</p>
+     <p><strong>Spilletid:</strong> ${escapeHtml(spil.playtime)}</p>
+     <p><strong>Spillere:</strong> ${playerText}</p>
+     <p><strong>Beskrivelse:</strong> ${escapeHtml(spil.desc)}</p>
+     ${extraInfo}
+   </div>
+ `;
 
   dialog.showModal();
 }

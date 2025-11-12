@@ -41,7 +41,7 @@ body {
   font-family: poppins, sans-serif;
   font-size: 1rem;
   line-height: 1.6;
-  background-image: url("img/Frame\ 284.png");
+  background-image: url("img/baggrundframe.svg");
   background-size: 190%;
   background-position: center 80px;
   background-repeat: no-repeat;
@@ -56,20 +56,19 @@ body {
 main {
   max-width: min(1400px, 95vw);
   margin: 0 auto;
-  padding: clamp(5rem, 10vw, 8rem) 1rem 2rem;
+  padding: clamp(5rem, 2vw, 8rem) 1rem 2rem;
   /* behold eksisterende paddings, men sørg for ekstra plads i bunden */
   padding-bottom: calc(2rem + var(--footer-height));
 }
 
 header {
-  position: sticky;
+  position:relative;
   top: 0;
   left: 0;
   width: 100%;
-  background-color: whitesmoke;
+  background-color: white;
   color: var(--text);
   padding: 0.2rem 1.2rem;
-  box-shadow: var(--shadow);
   z-index: 1000;
   display: grid;
   grid-template-columns: 0.5fr auto 0.5fr;
@@ -90,9 +89,10 @@ header h1 img {
 }
 
 header .search-bar {
-  grid-column: 1;
-  display: flex;
-  justify-content: flex-start;
+  grid-column: 2;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
 }
 
 header .favoritterknap {
@@ -111,6 +111,96 @@ header .favoritterknap img {
 header .favoritterknap:hover img {
   transform: scale(1.1);
 }
+
+
+/* Header layout: logo | centreret nav | højre kolonne */
+header {
+  /* overskriv tidligere grid-opsætning så layoutet matcher designet */
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 1rem;
+  padding-top: 1.5rem !important; /* juster tallet efter behov */
+  padding-bottom: 0.6rem;         /* valgfri: balancer bund-padding */
+}
+
+/* Logo */
+.logo {
+  grid-column: 1;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding-left: 1rem;
+}
+.logo img {
+  min-height: 120px;
+  max-height: 120px; /* juster størrelse efter behov */
+  width: auto;
+}
+
+/* Centreret navigation */
+.main-nav {
+  grid-column: 3;
+  display: flex;
+  justify-content: flex-start;
+}
+.main-nav ul {
+  display: flex;
+  gap: 2.5rem;
+  list-style: none;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+}
+.main-nav a {
+  text-decoration: none;
+  color: var(--text);
+  font-size: 1.25rem;
+  font-weight: 300;
+  letter-spacing: 0.02em;
+}
+
+/* Højre kolonne: Spiloversigt + In English */
+.right-links {
+  grid-column: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 0.25rem;
+  padding-right: 1rem;
+}
+.right-links .spiloversigt {
+  font-size: 1.6rem;
+  color: var(--text);
+  text-decoration: none;
+  border-bottom: 3px solid darkred;
+  padding-bottom: 0.25rem;
+}
+.right-links .in-english {
+  font-size: 1rem;
+  color: var(--text-light);
+  text-decoration: none;
+}
+
+/* Responsivt: slå navigation sammen under 700px */
+@media (max-width: 699px) {
+  header {
+    grid-template-columns: auto 1fr;
+    gap: 0.5rem;
+  }
+  .right-links { grid-column: 2; flex-direction: row; gap: 1rem; justify-content: flex-end; }
+  .main-nav { display: none; } /* eller lav hamburger-menu */
+  .logo img { max-height: 90px; }
+}
+
+/* Responsivt: skaler logo på små skærme */
+@media (max-width: 699px) {
+  .logo img,
+  header h1 img {
+    max-height: 120px;
+  }
+}
+/*Slut header fra spilcafeen.dk */
 
 #top {
   scroll-margin-top: 100px; /* juster efter headerens højde */
@@ -133,11 +223,13 @@ header .favoritterknap:hover img {
    FILTERBAR STYLES
    ===================== */
 
+   
+
 /* Gør knapperne til en række */
 .filters-header {
   display: flex;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: flex-end;
   gap: 0.4rem; /* meget lille afstand mellem knapperne */
   margin-bottom: 0.75rem;
 }
@@ -169,31 +261,31 @@ header .favoritterknap:hover img {
   border: 2px solid var(--primary);
   border-radius: var(--radius);
   font-size: 1rem;
-  cursor: pointer;
-}
-
-.filterbar input,
-.filterbar select :hover {
-  transform: scale(1.02);
-  box-shadow: var(--shadow);
 }
 
 #search-bar {
   max-width: 400px;
   display: flex;
   align-items: center;
-  justify-content: space-between; /* Ikoner ud til hver side */
+  justify-content: center; /* Ikoner ud til hver side */
 }
 
 .search-bar {
+  grid-column: 2;
   width: 100%;
   display: flex;
-  justify-content: flex-start;
+  justify-content: center;
+  align-items: center;
   margin-top: 1rem;
+}
+
+#genre-select {
+  max-width: 200px;
 }
 
 /* STYLING AF FILTER-BAR */
 #search-input,
+#genre-select,
 #sort-select {
   background: white;
   color: var(--text);
@@ -203,38 +295,50 @@ header .favoritterknap:hover img {
   font-size: 1rem;
   transition: var(--transition);
   box-shadow: var(--shadow);
+  flex: 1 1 auto;
+  min-width: 20px;
+  max-width: 700px;
+
 }
 
-/* RYD alle filtre */
-.clear-filters {
-  width: 100%;
-  display: flex;
-  justify-content: flex-start;
-  margin-top: 1rem;
-}
-
-#clear-filters {
-  background: white;
-  color: var(--text);
-  border: 2px solid darkred;
+/* RYD KNAP */
+.clear-btn {
+  background: darkred;
+  color: white;
+  border: none;
   border-radius: var(--radius);
   padding: 0.75rem 1.5rem;
   font-size: 1rem;
   cursor: pointer;
   box-shadow: var(--shadow);
   transition: var(--transition);
-  min-width: 120px;
+  display: flex;
+  align-items: right;
+}
+
+.clear-btn:hover {
+  background: var(--error);
+  color: white;
+  transform: scale(1.05);
+}
+
+#clear-filters {
+  margin-left: auto; /* Skub knappen til højre */
+  background: whitesmoke;
+  color: var(--text);
+  align-self: center;
+  margin-top: 0;
 }
 
 #clear-filters:hover {
-  background: darkred;
+  background: #d6746b;
+  color: white;
   transform: scale(1.1);
 }
 
-/*krydsknappeer ved hver filtrering*/
 .clear-filter {
   margin-left: 0.5rem;
-
+  background: whitesmoke;
   color: var(--text);
   border: none;
   border-radius: var(--radius);
@@ -243,6 +347,11 @@ header .favoritterknap:hover img {
   cursor: pointer;
   box-shadow: var(--shadow);
   transition: var(--transition);
+}
+.clear-filter:hover {
+  background: #d6746b;
+  color: white;
+  transform: scale(1.1);
 }
 
 /* Toggle-knap */
@@ -257,6 +366,7 @@ header .favoritterknap:hover img {
   color: var(--text);
   margin: 0.75rem 0;
   font-family: poppins, sans-serif;
+  
 }
 
 .filters-toggle:hover {
@@ -272,6 +382,7 @@ header .favoritterknap:hover img {
   padding-top: 0;
   padding-bottom: 0;
   pointer-events: none;
+  justify-content: flex-end;
 }
 
 /* Open panel (synlig) */
@@ -280,7 +391,10 @@ header .favoritterknap:hover img {
   opacity: 1;
   transition: max-height 320ms ease, opacity 220ms ease;
   pointer-events: auto;
+  display: flex;
   padding: 0.5rem 0;
+  align-items: flex-end;
+  justify-content: flex-start;
 }
 
 /* Småjustering: gør filterbar til flex/grid som før */
@@ -292,10 +406,12 @@ header .favoritterknap:hover img {
   align-items: center;
 }
 
+
 .search-bar {
   width: 100%;
   display: flex;
-  justify-content: flex-start;
+  justify-content: center;
+  align-items: center;
   margin-top: 1rem;
 }
 
@@ -321,18 +437,47 @@ header .favoritterknap:hover img {
 /* =====================
    SPIL CARD STYLES
    ===================== */
-.spil-card {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  border-radius: 10px;
-  background-color: darkred;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.219);
-  overflow: hidden;
-  border: solid darkred;
-  border-width: 2px;
-  padding: 30px;
+
+
+
+/* =====================
+  SPIL HEADER (titel + rating + stjerne)
+  ===================== */
+.spil-header {
+ display: flex;
+ align-items: center;
+ justify-content: space-between; /* Titel til venstre, rating til højre */
+ margin-bottom: 0.5rem;
 }
+
+
+.spil-title {
+ font-size: 2rem;
+ font-weight: 600;
+ margin: 0;
+}
+
+
+.spil-rating-wrapper {
+ display: flex;
+ align-items: center;
+ gap: 0.25rem;
+}
+
+
+.spil-rating {
+ font-size: 1rem;
+ font-weight: 500;
+}
+
+
+.stjerne-icon {
+ width: 18px;
+ height: 18px;
+ object-fit: contain;
+}
+
+
 .heart-icon {
   position: absolute;
   top: 8px;
@@ -348,10 +493,7 @@ header .favoritterknap:hover img {
   opacity: 0.8;
 }
 
-.spil-card:focus {
-  outline: darkred;
-  outline-offset: 2px;
-}
+
 
 .spil-poster {
   width: 100%;
@@ -373,7 +515,7 @@ header .favoritterknap:hover img {
 }
 
 /* Ret baggrundsfarven (manglede '#') og sørg for kort fylder sin grid-celle */
-.spil-card {
+.spil-card, .carousel-card {
   display: flex;
   flex-direction: column;
   border-radius: 10px;
@@ -384,12 +526,20 @@ header .favoritterknap:hover img {
   border: 2px solid darkred;
   width: 100%; /* fylder kolonnen */
   cursor: pointer;
+  padding: 30px;
 }
 
 .spil-card:hover {
+  box-shadow: #212223 0px 4px 12px;
   transform: scale(1.03);
-  box-shadow: #212223 0px 4px 20px;
 }
+
+.carousel-card:hover {
+  box-shadow: #212223 0px 4px 12px;
+  transform: scale(1.03);
+}
+
+
 
 /* indholdet under billedet skal kunne fylde ud */
 .spil-info {
@@ -397,39 +547,6 @@ header .favoritterknap:hover img {
   flex-direction: column;
   gap: 0.4rem;
   flex: 1; /* <– så det fylder resten af kortet */
-}
-
-/* =====================
-   SPIL HEADER (titel + rating + stjerne)
-   ===================== */
-.spil-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between; /* Titel til venstre, rating til højre */
-  margin-bottom: 0.5rem;
-}
-
-.spil-title {
-  font-size: 2rem;
-  font-weight: 600;
-  margin: 0;
-}
-
-.spil-rating-wrapper {
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-}
-
-.spil-rating {
-  font-size: 1rem;
-  font-weight: 500;
-}
-
-.stjerne-icon {
-  width: 18px;
-  height: 18px;
-  object-fit: contain;
 }
 
 /* beskrivelsen må gerne bruge pladsen */
@@ -557,3 +674,87 @@ dialog#spil-dialog::backdrop {
   gap: 2rem;
   align-items: stretch; /* <– i stedet for start */
 }
+
+/* =====================
+   CAROUSEL STYLES
+   ===================== */
+/* Carousel: scroll-snap og scrollable viewport */
+
+#top-carousel.carousel {
+  position: relative; 
+  padding-top: 2rem; /* plads til titel */
+  display: flex; /* brug flexbox til layout */
+  align-items: center; /* centrer vertikalt */
+  gap: 0.5rem; /* afstand mellem elementer */
+  margin: 1rem 0; /* lodret margin */
+}
+
+/* linje i fuld viewport-bredde, centreret under titlen */
+#top-carousel.carousel::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  /* juster top for at placere linjen præcis mellem titel og track */
+  top: 0.5rem;
+  width: 100vw;
+  height: 3px;            /* tykkelse på stregen */
+  background: darkred;    /* farve på stregen */
+  z-index: 2;
+}
+
+.carousel-viewport {
+ overflow-x: auto;
+ -webkit-overflow-scrolling: touch;
+ scroll-snap-type: x mandatory;
+ flex: 1 1 auto;
+ outline: none;
+}
+.carousel-track {
+ display: flex;
+ gap: 1rem;
+ align-items: stretch;
+ will-change: transform;
+ transition: none !important;
+
+ /* no transform-based transition needed when using scroll */
+}
+
+
+
+.carousel-card {
+ scroll-snap-align: start;
+ min-width: 300px;
+ max-width: 350px;
+ flex: 0 0 auto;
+ background: #fff;
+ border-radius: 10px;
+ border: 2px solid darkred;
+ box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+ overflow: hidden;
+ cursor: pointer;
+ display: flex;
+ flex-direction: column;
+ padding: 40px;
+}
+
+
+
+.carousel-poster { width: 100%; height: 120px; object-fit: cover; display: block; }
+/* indicate dragging */
+.carousel-viewport.dragging { cursor: grabbing; cursor: -webkit-grabbing; }
+
+.carousel-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  position: absolute;
+  left: 0;
+  top: 0;
+  margin: 0;
+  font-weight: 700;
+  transform: translateY(-100%); /* placerer over selve karusellen */
+  padding-left: 0.25rem;
+  color: var(--text);
+}
+
+
