@@ -1,0 +1,967 @@
+:root {
+  /* Colors */
+  --rød: #a43228;
+  --whitesmoke: #f5f5f5;
+  --moonlight-white: #fafafa;
+  --sort: #000000;
+
+  /* Effects */
+  --shadow: 0 4px 6px -1px var(0 0 0 / 0.3);
+  --shadow-lg: var(--shadow);
+  --radius: 1rem;
+  --transition: 250ms ease;
+}
+
+/* =====================
+   GLOBAL STYLES
+   ===================== */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* HER ÆNDRER VI BAGGRUNDEN */
+body {
+  font-family: "Poppins", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    Arial, sans-serif;
+  font-size: 1rem;
+  line-height: 1.6;
+  background-image: url("img/Frame\ 284.png");
+  background-size: 190%;
+  background-position: center 80px;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  color: var(--sort);
+  min-height: 100vh;
+}
+
+/* =====================
+   LAYOUT (main container)
+   ===================== */
+main {
+  max-width: 1500px;
+  margin: 0 auto;
+  padding: clamp(5rem, 10vw, 8rem) 2rem 3rem;
+  padding-bottom: calc(3rem + var(--footer-height));
+}
+
+header {
+  position: relative;
+  width: 100%;
+  background-color: var(--whitesmoke);
+  color: var(--sort);
+  padding: 0.75rem 3rem;
+  box-shadow: var(--shadow);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+header h1 {
+  margin: 0;
+  display: flex;
+  justify-content: flex-start;
+  flex-shrink: 0;
+}
+
+header h1 img {
+  max-height: 90px;
+  width: auto;
+}
+
+.main-nav {
+  display: flex;
+  gap: 3rem;
+  align-items: center;
+  flex: 1;
+  justify-content: flex-end;
+  margin-right: 1rem;
+}
+
+.main-nav a {
+  text-decoration: none;
+  color: var(--sort);
+  font-weight: 400;
+  font-size: 1.1rem;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  padding: 0.25rem 0;
+  border-bottom: 2px solid transparent;
+}
+
+.main-nav a:hover {
+  color: var(--rød);
+  border-bottom-color: var(--rød);
+}
+
+.nav-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.nav-group .active-page {
+  border-bottom: 2px solid var(--rød);
+  font-weight: 500;
+}
+
+.nav-group .sub-link {
+  font-size: 0.9rem;
+  color: var(--sort);
+  padding: 0;
+}
+
+.nav-group .sub-link:hover {
+  color: var(--rød);
+  border-bottom: none;
+}
+
+header .favoritterknap {
+  display: flex;
+  justify-content: flex-end;
+  flex-shrink: 0;
+}
+
+header .favoritterknap img {
+  transition: transform 0.2s ease;
+  max-height: 50px;
+  width: auto;
+}
+
+header .favoritterknap:hover img {
+  transform: scale(1.1);
+}
+
+#top {
+  scroll-margin-top: 100px; /* juster efter headerens højde */
+  scroll-behavior: smooth;
+  margin: -10px 0 0 0; /* juster efter headerens højde */
+}
+
+/* fjern link-styling for skip-to-top */
+.skip-to-top {
+  color: inherit;
+  text-decoration: none;
+  display: inline-block;
+}
+.skip-to-top:focus,
+.skip-to-top:hover {
+  text-decoration: none;
+}
+
+/* =====================
+   TOP 10 CAROUSEL
+   ===================== */
+.top10-section {
+  margin: 0.01rem 0 2rem 0;
+  padding: 0 1rem;
+}
+
+.top10-section h2 {
+  text-align: left;
+  font-size: 1.75rem;
+  margin-bottom: 1.5rem;
+  color: var(--rød);
+  padding-bottom: 0.75rem;
+  border-bottom: 2px solid var(--rød);
+  font-weight: 600;
+}
+
+.carousel-container {
+  position: relative;
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+.carousel-wrapper {
+  overflow-x: auto;
+  overflow-y: hidden;
+  width: 100%;
+  scrollbar-width: thin;
+  scrollbar-color: var(--rød) var(--moonlight-white);
+  scroll-behavior: smooth;
+}
+
+.carousel-wrapper::-webkit-scrollbar {
+  height: 8px;
+}
+
+.carousel-wrapper::-webkit-scrollbar-track {
+  background: var(--moonlight-white);
+  border-radius: 10px;
+}
+
+.carousel-wrapper::-webkit-scrollbar-thumb {
+  background: var(--rød);
+  border-radius: 10px;
+}
+
+.carousel-wrapper::-webkit-scrollbar-thumb:hover {
+  background: var(--rød);
+}
+
+.carousel-track {
+  display: flex;
+  gap: 1.25rem;
+  padding: 0.5rem 0 1rem 0;
+  width: max-content;
+}
+
+.carousel-track .spil-card {
+  flex: 0 0 220px;
+  height: 400px;
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.carousel-track .spil-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow);
+}
+
+.carousel-track .spil-poster {
+  height: 130px;
+  object-fit: contain;
+  flex-shrink: 0;
+  margin-bottom: 0;
+  background: var(--whitesmoke);
+  border-bottom: 1px solid #ddd;
+}
+
+.carousel-track .spil-info {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  min-height: 0;
+  background: var(--moonlight-white);
+}
+
+.carousel-track h3 {
+  font-size: 0.875rem;
+  margin-bottom: 0.35rem;
+  line-height: 1.3;
+}
+
+.carousel-track p {
+  font-size: 0.8rem;
+  margin: 0.25rem 0;
+}
+
+.carousel-track .details-btn {
+  margin-top: auto;
+  padding: 0.4rem 0.75rem;
+  font-size: 0.8rem;
+}
+
+.carousel-btn {
+  display: none;
+}
+
+/* =====================
+   FILTERBAR STYLES
+   ===================== */
+
+.filter-search-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 2rem;
+  padding: 0.75rem;
+  background: var(--moonlight-white);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.search-bar-main {
+  flex: 1;
+  max-width: 600px;
+  display: flex;
+  justify-content: center;
+  margin: 0 auto;
+}
+
+.search-bar-main #search-input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 2px solid var(--rød);
+  border-radius: var(--radius);
+  font-size: 1rem;
+  box-shadow: var(--shadow);
+}
+
+.filterbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  align-items: center;
+}
+
+.filter-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.filterbar input,
+.filterbar select {
+  flex: 1;
+  min-width: 200px;
+  padding: 0.5rem 1rem;
+  border: 2px solid var(--rød);
+  border-radius: var(--radius);
+  font-size: 1rem;
+}
+
+#search-bar {
+  max-width: 400px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* Ikoner ud til hver side */
+}
+
+.search-bar {
+  width: 100%;
+  display: flex;
+  justify-content: flex-start;
+  margin-top: 1rem;
+}
+
+#search-input,
+#sort-select {
+  background: var(--moonlight-white);
+  color: var(--sort);
+  border: 2px solid var(--moonlight-white);
+  border-radius: var(--radius);
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  box-shadow: var(--shadow);
+}
+
+#search-input,
+#sort-select {
+  outline: none;
+  border-color: var(--rød);
+  box-shadow: var(--shadow);
+}
+
+/* ---------- FILTER DROPDOWNS ---------- */
+#genre-select,
+#players-select,
+#playtime-select,
+#location-select,
+#difficulty-select,
+#age {
+  flex: 1;
+  min-width: 200px;
+  padding: 0.5rem 1rem;
+  border: 2px solid var(--rød);
+  border-radius: var(--radius);
+  font-size: 1rem;
+  background: var(--moonlight-white);
+  color: var(--sort);
+  box-shadow: var(--shadow);
+  transition: all 0.3s ease;
+}
+
+#genre-select:focus,
+#players-select:focus,
+#playtime-select:focus,
+#location-select:focus,
+#difficulty-select:focus,
+#age:focus {
+  outline: none;
+  border-color: var(--rød);
+  box-shadow: var(--shadow);
+}
+
+/* RYD KNAP */
+.clear-btn {
+  background: var(--moonlight-white);
+  color: var(--sort);
+  border: 2px solid var(--rød);
+  border-radius: var(--radius);
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  font-weight: 500;
+}
+
+.clear-btn:hover {
+  background: var(--rød);
+  color: var(--moonlight-white);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow);
+}
+
+#clear-filters {
+  background: var(--moonlight-white);
+  color: var(--sort);
+  border: 2px solid var(--rød);
+  align-self: center;
+  margin-top: 0;
+  margin-left: 0;
+}
+
+#clear-filters:hover {
+  background: var(--rød);
+  color: var(--moonlight-white);
+  transform: scale(1.05);
+}
+
+.clear-filter {
+  margin-left: 0.5rem;
+  background: var(--whitesmoke);
+  color: var(--sort);
+  border: none;
+  border-radius: var(--radius);
+  padding: 0.25rem 0.5rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+  transition: var(--transition);
+}
+.clear-filter:hover {
+  background: var(--rød);
+  color: var(--moonlight-white);
+  transform: scale(1.1);
+}
+
+/* Toggle-knap */
+.filters-toggle {
+  background: var(--moonlight-white);
+  border: 2px solid var(--rød);
+  border-color: var(--rød);
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 1rem;
+  color: var(--sort);
+  margin: 0.75rem 0;
+  font-family: poppins, sans-serif;
+  box-shadow: var(--shadow);
+}
+
+.filters-toggle:hover {
+  transform: scale(1.05);
+}
+
+/* Collapsed panel (skjult) */
+#filters-panel.collapsed {
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: max-height 240ms ease, opacity 180ms ease;
+  padding-top: 0;
+  padding-bottom: 0;
+  pointer-events: none;
+}
+
+/* Open panel (synlig) */
+#filters-panel.open {
+  max-height: 800px; /* stor nok til indhold */
+  opacity: 1;
+  transition: max-height 320ms ease, opacity 220ms ease;
+  pointer-events: auto;
+  padding: 0.5rem 0;
+}
+
+/* Småjustering: gør filterbar til flex/grid som før */
+#filters-panel.filterbar,
+.filterbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.search-bar {
+  width: 100%;
+  display: flex;
+  justify-content: flex-start;
+  margin-top: 1rem;
+}
+
+#search-btn {
+  background: var(--moonlight-white);
+  color: var(--sort);
+  border: 2px solid var(--rød);
+  border-radius: var(--radius);
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+  transition: var(--transition);
+  min-width: 120px;
+}
+
+#search-btn:hover {
+  background: var(--rød);
+  color: var(--moonlight-white);
+  transform: scale(1.05);
+}
+
+/* =====================
+   SPIL CARD STYLES
+   ===================== */
+.spil-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  border-radius: 10px;
+  background-color: var(--moonlight-white);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.219);
+  overflow: hidden;
+  border: solid var(--rød);
+  border-width: 2px;
+  padding: 0;
+}
+.heart-icon {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 24px; /* juster størrelsen som du vil */
+  height: 24px;
+  cursor: pointer;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+  z-index: 5;
+}
+
+.heart-icon:hover {
+  transform: scale(1.1);
+  opacity: 0.8;
+}
+
+.spil-card:focus {
+  outline: var(--rød);
+  outline-offset: 2px;
+}
+
+.spil-poster {
+  width: 100%;
+  height: 400px;
+  object-fit: contain;
+  background: var(--whitesmoke);
+  transition: transform 0.3s ease;
+  margin-bottom: 0;
+  border-bottom: 1px solid #ddd;
+}
+
+.spil-info {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  flex-grow: 1;
+  background: var(--moonlight-white);
+}
+
+.title-rating-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.35rem;
+}
+
+.spil-rating {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-weight: 600;
+  font-size: 0.95rem;
+  flex-shrink: 0;
+}
+
+.rating-star {
+  width: 16px;
+  height: 16px;
+  vertical-align: middle;
+}
+
+.spil-info h3 {
+  font-size: 1.5rem;
+  margin: 0 0 0.35rem 0;
+  color: var(--sort);
+  font-weight: 600;
+}
+
+.spil-info p {
+  margin: 0.2rem 0;
+  font-size: 0.9rem;
+  color: var(--sort);
+  line-height: 1.4;
+}
+
+.spil-info p strong {
+  color: var(--rød);
+  font-weight: 600;
+}
+
+/* ...existing code... */
+
+/* SPIL GRID: vis to kort side om side */
+.spil-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1.75rem;
+  align-items: stretch;
+  margin-top: 1.5rem;
+  padding: 0 1rem;
+}
+
+/* Ret baggrundsfarven (manglede '#') og sørg for kort fylder sin grid-celle */
+.spil-card {
+  position: relative; /* ensure .spil-rating is positioned relative to each card */
+  display: flex;
+  flex-direction: column;
+  border-radius: 10px;
+  border-style: solid;
+  background-color: var(--whitesmoke);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  border: 2px solid var(--rød);
+  width: 100%;
+  height: 100%;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.spil-card:hover {
+  box-shadow: var(--shadow);
+}
+
+/* Gør billedhøjden mindre når kortene står ved siden af hinanden */
+@media (min-width: 700px) {
+  .spil-poster {
+    height: 160px;
+  }
+}
+
+/* Tablet: to kolonner */
+@media (max-width: 1024px) and (min-width: 700px) {
+  .spil-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* Mobile: to kolonner */
+@media (max-width: 699px) {
+  .spil-grid {
+    grid-template-columns: repeat(2, 1fr);
+    padding: 0 0.5rem;
+    gap: 0.75rem;
+  }
+
+  .spil-poster {
+    height: 180px;
+  }
+
+  /* Header mobile - meget kompakt */
+  header {
+    padding: 0.5rem;
+    gap: 0.25rem;
+    min-height: auto;
+  }
+
+  header h1 {
+    flex-shrink: 0;
+  }
+
+  header h1 img {
+    max-height: 40px;
+  }
+
+  .main-nav {
+    gap: 0.25rem;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    margin-right: 0.25rem;
+  }
+
+  .main-nav::-webkit-scrollbar {
+    display: none;
+  }
+
+  .main-nav a {
+    font-size: 0.65rem;
+    padding: 0.15rem 0;
+    white-space: nowrap;
+  }
+
+  .nav-group {
+    gap: 0.1rem;
+  }
+
+  .nav-group .sub-link {
+    font-size: 0.6rem;
+  }
+
+  header .favoritterknap {
+    flex-shrink: 0;
+  }
+
+  header .favoritterknap img {
+    max-height: 30px;
+  }
+
+  /* Filter container mobile */
+  .filter-search-container {
+    padding: 0.5rem;
+    gap: 0.5rem;
+  }
+
+  .search-bar-main {
+    max-width: 100%;
+  }
+
+  .filters-toggle {
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+  }
+
+  #clear-filters {
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+  }
+
+  .filterbar {
+    gap: 0.5rem;
+  }
+
+  .filter-item {
+    width: 100%;
+  }
+
+  #genre-select,
+  #players-select,
+  #playtime-select,
+  #location-select,
+  #difficulty-select,
+  #age {
+    min-width: 100%;
+    font-size: 0.85rem;
+    padding: 0.4rem 0.8rem;
+  }
+
+  /* Top 10 mobile */
+  .top10-section {
+    padding: 0 0.5rem;
+    margin: 0.5rem 0 2rem 0;
+  }
+
+  .top10-section h2 {
+    font-size: 1.1rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .carousel-track .spil-card {
+    flex: 0 0 140px;
+    height: 320px;
+  }
+
+  .carousel-track .spil-poster {
+    height: 100px;
+  }
+
+  .carousel-track h3 {
+    font-size: 0.7rem;
+  }
+
+  .carousel-track p {
+    font-size: 0.65rem;
+  }
+
+  .carousel-track .spil-info {
+    padding: 0.5rem;
+  }
+
+  /* Spilkort mobile */
+  .spil-card {
+    border-width: 1px;
+  }
+
+  .spil-info {
+    padding: 0.5rem;
+  }
+
+  .spil-info h3 {
+    font-size: 0.85rem;
+  }
+
+  .spil-info p {
+    font-size: 0.75rem;
+    margin: 0.1rem 0;
+  }
+
+  .title-rating-container {
+    gap: 0.25rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .spil-rating {
+    font-size: 0.7rem;
+  }
+
+  .rating-star {
+    width: 12px;
+    height: 12px;
+  }
+
+  .heart-icon {
+    width: 20px;
+    height: 20px;
+    top: 6px;
+    right: 6px;
+  }
+
+  /* Dialog mobile */
+  #dialog-content {
+    grid-template-columns: 1fr;
+    padding: 1rem;
+    gap: 1rem;
+  }
+
+  .dialog-left h2 {
+    font-size: 1.25rem;
+  }
+
+  .dialog-right {
+    order: 1;
+  }
+
+  .dialog-left {
+    order: 2;
+  }
+
+  /* Main padding mobile */
+  main {
+    padding: 2.5rem 0.5rem 2rem;
+  }
+}
+
+/* ...existing code... */
+
+.details-btn {
+  display: none;
+}
+
+/* Make footer sticky to viewport bottom */
+
+/* Juster på små skærme hvis nødvendigt */
+@media (max-width: 480px) {
+  :root {
+    --footer-height: 56px;
+  }
+}
+
+/* =====================
+   Spil DIALOG
+   ===================== */
+dialog#spil-dialog {
+  border: none;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lg);
+  padding: 0;
+  max-width: min(95vw, 1000px);
+  max-height: 90vh;
+  background: var(--whitesmoke);
+  color: var(--sort);
+  overflow: hidden;
+  position: relative;
+  margin: auto;
+}
+
+dialog#spil-dialog::backdrop {
+  backdrop-filter: blur(8px);
+}
+
+#close-dialog {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: var(--moonlight-white);
+  color: var(--sort);
+  border: none;
+  border-radius: 50%;
+  width: 2.5rem;
+  height: 2.5rem;
+  font-size: 1.25rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition);
+  z-index: 10;
+}
+
+#close-dialog:hover {
+  background: var(--rød);
+  color: var(--moonlight-white);
+  transform: scale(1.1);
+}
+
+#dialog-content {
+  padding: 2rem;
+  display: grid;
+  grid-template-columns: 2fr minmax(250px, 1fr);
+  gap: 2rem;
+  align-items: start;
+  overflow-y: auto;
+  max-height: 90vh;
+}
+
+.dialog-left {
+  order: 1;
+}
+
+.dialog-left h2 {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  color: var(--rød);
+}
+
+.dialog-left .info-grid {
+  margin-top: 2rem;
+}
+
+.dialog-right {
+  order: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.dialog-right .spil-poster {
+  width: 100%;
+  height: auto;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.dialog-right .rules-section {
+  margin-top: 0;
+  max-width: 600px;
+}
+
+.dialog-right .rules-text {
+  max-height: 150px;
+  overflow-y: auto;
+  line-height: 1.5;
+}

@@ -13,8 +13,7 @@ let allSpil = [];
 function norm(s) {
   return s === undefined || s === null ? "" : String(s).trim().toLowerCase();
 }
-// Escape HTML for sikker indsættelse
-// Bruges til at undgå XSS ved indsættelse af brugerdata i HTML
+
 function escapeHtml(str) {
   if (str === undefined || str === null) return "";
   return String(str)
@@ -29,28 +28,8 @@ window.addEventListener("DOMContentLoaded", initApp);
 
 function initApp() {
   console.log("initApp: starter");
-  wrapFilterButtons(); // ← flytter knapperne
   bindUI();
   getSpil();
-}
-
-function wrapFilterButtons() {
-  const toggleBtn = document.querySelector("#toggle-filters");
-  const clearBtn = document.querySelector("#clear-filters");
-  const filtersPanel = document.querySelector("#filters-panel");
-
-  if (!toggleBtn || !clearBtn) return;
-
-  // Lav en container til knapperne
-  const header = document.createElement("div");
-  header.className = "filters-header";
-
-  // Indsæt den lige før filter-panelet
-  filtersPanel.parentNode.insertBefore(header, filtersPanel);
-
-  // Flyt knapperne ind i containeren
-  header.appendChild(toggleBtn);
-  header.appendChild(clearBtn);
 }
 
 function bindUI() {
@@ -78,12 +57,6 @@ function bindUI() {
       panel.setAttribute("aria-hidden", String(!isOpen));
       toggleBtn.setAttribute("aria-expanded", String(isOpen));
       toggleBtn.textContent = isOpen ? "Skjul filtre ▴" : "Vis filtre ▾";
-
-      const clearBtn = document.querySelector("#clear-filters");
-      if (clearBtn) {
-        clearBtn.style.display = isOpen ? "inline-flex" : "none";
-      }
-
       if (isOpen) {
         const first = panel.querySelector("select, input");
         if (first) first.focus();
@@ -110,145 +83,6 @@ function bindUI() {
   });
 }
 
-// Opret top 10 carousel
-function createTop10Carousel() {
-  const SPEED_PX_PER_SEC = 40; // juster hastighed (px/s)
-  const top10 = [...allSpil]
-    .sort((a, b) => (b.rating || 0) - (a.rating || 0))
-    .slice(0, 10);
-  if (!top10.length) return;
-
-  const existing = document.querySelector("#top-carousel");
-  if (existing) existing.remove();
-
-  const container = document.createElement("section");
-  container.id = "top-carousel";
-  container.className = "carousel";
-
-  container.innerHTML = `
-    <h2 class="carousel-title">Top 10</h2>
-    <div class="carousel-viewport" tabindex="0" aria-roledescription="carousel">
-      <div class="carousel-track"></div>
-    </div>
-  `;
-
-  const track = container.querySelector(".carousel-track");
-  const viewport = container.querySelector(".carousel-viewport");
-
-  for (const s of top10) {
-    const title = s.title || s.name || "Untitled";
-    const img = s.image || s.image_url || "";
-    const rating = s.rating ?? "N/A";
-    const card = document.createElement("article");
-    card.className = "carousel-card";
-    card.innerHTML = `
-      <img src="${escapeHtml(img)}" alt="${escapeHtml(
-      title
-    )}" class="carousel-poster">
-      <div class="carousel-info">
-        <h4>${escapeHtml(title)}</h4>
-        <div class="carousel-meta">⭐ ${escapeHtml(String(rating))}</div>
-      </div>
-    `;
-    card.addEventListener("click", () => showSpilModal(s));
-    track.appendChild(card);
-  }
-
-  // ensure container inserted into DOM
-  const spilList = document.querySelector("#spil-list");
-  if (spilList) spilList.before(container);
-  else document.querySelector("main").prepend(container);
-
-  // Duplicate children to enable seamless loop
-  const originalChildren = Array.from(track.children);
-  for (const child of originalChildren) {
-    const clone = child.cloneNode(true);
-    // keep click handler for modal by delegation to cloned content
-    track.appendChild(clone);
-  }
-
-  // wait for images to load before measuring
-  const imgs = Array.from(track.querySelectorAll("img"));
-  const imgPromises = imgs.map((img) =>
-    img.complete
-      ? Promise.resolve()
-      : new Promise((res) => img.addEventListener("load", res, { once: true }))
-  );
-
-  Promise.all(imgPromises).then(() => {
-    track.style.display = "flex";
-    track.style.gap = getComputedStyle(track).gap || "1rem";
-    track.style.willChange = "transform";
-
-    // measure width of one loop (original set)
-    const originalWidth =
-      originalChildren.reduce((sum, el) => {
-        const r = el.getBoundingClientRect();
-        return sum + r.width;
-      }, 0) +
-      (originalChildren.length - 1) *
-        parseFloat(getComputedStyle(track).gap || "0");
-
-    // if zero width fallback
-    const loopWidth =
-      originalWidth > 0 ? originalWidth : track.scrollWidth / 2 || 800;
-
-    let offset = 0;
-    let last = performance.now();
-    let paused = false;
-
-    function step(now) {
-      const dt = (now - last) / 1000;
-      last = now;
-      if (!paused) {
-        offset += SPEED_PX_PER_SEC * dt;
-        if (offset >= loopWidth) offset -= loopWidth;
-        track.style.transform = `translateX(${-offset}px)`;
-      }
-      requestAnimationFrame(step);
-    }
-
-    // pause/resume on hover & focus
-    container.addEventListener("mouseenter", () => (paused = true));
-    container.addEventListener("mouseleave", () => (paused = false));
-    viewport.addEventListener("focusin", () => (paused = true));
-    viewport.addEventListener("focusout", () => (paused = false));
-
-    // allow pointer drag to temporarily pause and nudge
-    let dragging = false;
-    let startX = 0;
-    let startOffset = 0;
-    viewport.addEventListener("pointerdown", (e) => {
-      dragging = true;
-      paused = true;
-      startX = e.clientX;
-      startOffset = offset;
-      viewport.setPointerCapture(e.pointerId);
-    });
-    viewport.addEventListener("pointermove", (e) => {
-      if (!dragging) return;
-      const dx = e.clientX - startX;
-      offset = startOffset - dx;
-      // wrap offset
-      offset = ((offset % loopWidth) + loopWidth) % loopWidth;
-      track.style.transform = `translateX(${-offset}px)`;
-    });
-    function endDrag(e) {
-      if (!dragging) return;
-      dragging = false;
-      paused = false;
-      viewport.releasePointerCapture?.(e?.pointerId);
-    }
-    viewport.addEventListener("pointerup", endDrag);
-    viewport.addEventListener("pointercancel", endDrag);
-    viewport.addEventListener("pointerleave", endDrag);
-
-    // start animation
-    last = performance.now();
-    requestAnimationFrame(step);
-  });
-}
-
 // Hent data
 async function getSpil() {
   try {
@@ -268,7 +102,7 @@ async function getSpil() {
     populateDifficultySelect();
     populateAgeSelect();
 
-    // Opret karusellen før eller efter display — sørg for at kalde funktionen
+    // Opret Top 10 karrusel
     createTop10Carousel();
 
     // Vis alt ved start
@@ -276,6 +110,171 @@ async function getSpil() {
   } catch (err) {
     console.error("Fejl i getSpil:", err);
   }
+}
+
+/* ---------- Top 10 Carousel ---------- */
+
+function createTop10Carousel() {
+  const container = document.querySelector("#top10-carousel");
+  if (!container) return;
+
+  // Tag de 10 bedst ratede spil
+  const top10 = [...allSpil]
+    .sort((a, b) => (b.rating || 0) - (a.rating || 0))
+    .slice(0, 10);
+
+  // Render hvert spil i karrusellen
+  for (const spil of top10) {
+    renderCarouselCard(spil, container);
+  }
+
+  // Initialiser karrusel-funktionalitet
+  initCarousel();
+}
+
+function renderCarouselCard(spil, container) {
+  const image = spil.image || spil.image_url || "";
+  const title = spil.title || spil.name || "Untitled";
+  const rating = spil.rating ?? "N/A";
+
+  let players = "-";
+  if (spil.players) {
+    if (
+      typeof spil.players === "object" &&
+      spil.players.min &&
+      spil.players.max
+    ) {
+      players = `${spil.players.min}-${spil.players.max}`;
+    } else if (
+      typeof spil.players === "string" ||
+      typeof spil.players === "number"
+    ) {
+      players = String(spil.players);
+    }
+  }
+
+  const liked = isFavorite(spil); // ← genbrug favorit-funktionalitet
+  const heartSrc = liked ? "img/fyldthjerte.png" : "img/tomthjerte.svg";
+  const location = spil.location;
+  const shelf = spil.shelf ?? "-";
+  const available = spil.available ? "✅ Tilgængelig" : "❌ Udlånt";
+
+  const html = `
+   <article class="spil-card carousel-card" tabindex="0">
+     <img src="${heartSrc}" alt="Favorit" class="heart-icon">
+     <img src="${escapeHtml(
+       image
+     )}" class="spil-poster" alt="Poster ${escapeHtml(title)}">
+     <div class="spil-info">
+       <div class="title-rating-container">
+         <h3>${escapeHtml(title)}</h3>
+         <span class="spil-rating"><img src="img/stjerne.svg" alt="rating" class="rating-star">${escapeHtml(
+           rating
+         )}</span>
+       </div>
+        <p><strong>Lokation:</strong> ${escapeHtml(location)}</p>
+        <p><strong>Hylde:</strong> ${escapeHtml(shelf)}</p>
+        <p><strong>Status:</strong> ${available}</p>
+     </div>
+   </article>
+ `;
+
+  container.insertAdjacentHTML("beforeend", html);
+  const el = container.lastElementChild;
+
+  if (el) {
+    // Gør hele kortet klikbart for at åbne modal
+    el.addEventListener("click", (e) => {
+      // Ignorer klik på hjerte-ikonet
+      if (!e.target.closest(".heart-icon")) {
+        showSpilModal(spil);
+      }
+    });
+
+    // Gør hjertet klikbart — samme logik som ved normale spil-cards
+    const heart = el.querySelector(".heart-icon");
+    if (heart) {
+      heart.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const favs = getFavorites();
+        const alreadyFav = isFavorite(spil);
+
+        if (alreadyFav) {
+          const newFavs = favs.filter((f) => f.title !== spil.title);
+          saveFavorites(newFavs);
+          heart.src = "img/tomthjerte.svg";
+        } else {
+          favs.push(spil);
+          saveFavorites(favs);
+          heart.src = "img/fyldthjerte.png";
+        }
+      });
+    }
+  }
+}
+
+// Smooth auto-scroll for karrusel - forbedret version
+function initCarousel() {
+  const wrapper = document.querySelector(".carousel-wrapper");
+  if (!wrapper) {
+    console.log("Carousel wrapper not found!");
+    return;
+  }
+
+  console.log("Initializing carousel auto-scroll...");
+  console.log("Total scrollWidth:", wrapper.scrollWidth);
+
+  const scrollSpeed = 1;
+  let scrollInterval = null;
+  let currentScroll = 0;
+
+  function startScrolling() {
+    if (scrollInterval) return;
+
+    scrollInterval = setInterval(() => {
+      currentScroll += scrollSpeed;
+
+      // Beregn hvor langt vi kan scrolle
+      const maxScroll = wrapper.scrollWidth - wrapper.clientWidth;
+
+      // Hvis vi når slutningen, reset til start
+      if (currentScroll >= maxScroll) {
+        currentScroll = 0;
+      }
+
+      wrapper.scrollLeft = currentScroll;
+    }, 30);
+
+    console.log("Auto-scroll started");
+  }
+
+  function stopScrolling() {
+    if (scrollInterval) {
+      clearInterval(scrollInterval);
+      scrollInterval = null;
+      currentScroll = wrapper.scrollLeft; // Gem positionen
+      console.log("Auto-scroll stopped at:", currentScroll);
+    }
+  }
+
+  // Start auto-scroll når siden loader
+  setTimeout(startScrolling, 500); // Lille delay for at sikre DOM er klar
+
+  // Stop ved hover/touch
+  wrapper.addEventListener("mouseenter", stopScrolling);
+  wrapper.addEventListener("touchstart", stopScrolling, { passive: true });
+
+  // Genstart når hover/touch stopper
+  wrapper.addEventListener("mouseleave", startScrolling);
+  wrapper.addEventListener(
+    "touchend",
+    () => {
+      setTimeout(startScrolling, 500);
+    },
+    { passive: true }
+  );
+
+  console.log("Carousel auto-scroll initialized!");
 }
 
 /* ---------- Populate helpers ---------- */
@@ -454,6 +453,22 @@ function filterSpil() {
     document.querySelector("#difficulty-select")?.value || "all";
   const ageValue = document.querySelector("#age")?.value || "all";
 
+  // Tjek om der er aktive filtre
+  const hasActiveFilters =
+    q !== "" ||
+    genreValue !== "all" ||
+    playersValue !== "all" ||
+    playtimeValue !== "all" ||
+    locationValue !== "all" ||
+    difficultyValue !== "all" ||
+    ageValue !== "all";
+
+  // Skjul/vis Top 10 baseret på om der er aktive filtre
+  const top10Section = document.querySelector(".top10-section");
+  if (top10Section) {
+    top10Section.style.display = hasActiveFilters ? "none" : "block";
+  }
+
   const result = allSpil.filter((s) => {
     if (q) {
       const title = (s.title || s.name || "").toLowerCase();
@@ -553,7 +568,19 @@ function renderSpilCard(spil, container) {
   const title = spil.title || spil.name || "Untitled";
   const rating = spil.rating ?? "N/A";
   const playtime = spil.playtime ?? spil.duration ?? "-";
-  const players = spil.players ?? spil.minPlayers ?? "-";
+
+  // Håndter players som objekt eller værdi
+  let players = "-";
+  if (typeof spil.players === "object" && spil.players !== null) {
+    if (spil.players.min && spil.players.max) {
+      players = `${spil.players.min}-${spil.players.max}`;
+    }
+  } else if (spil.players) {
+    players = spil.players;
+  } else if (spil.minPlayers) {
+    players = spil.minPlayers;
+  }
+
   const genreLabel = Array.isArray(spil.genre)
     ? spil.genre.join(", ")
     : spil.genre
@@ -563,23 +590,9 @@ function renderSpilCard(spil, container) {
 
   const liked = isFavorite(spil);
 
-  // === Spillere ===
-  let playerText = "Ukendt";
-  if (spil.players) {
-    if (typeof spil.players === "object") {
-      const min = spil.players.min || spil.players.minimum || "";
-      const max = spil.players.max || spil.players.maximum || "";
-      if (min && max && min !== max) {
-        playerText = `${min}–${max}`;
-      } else if (min) {
-        playerText = `${min}`;
-      } else {
-        playerText = "Ukendt";
-      }
-    } else {
-      playerText = spil.players;
-    }
-  }
+  const location = spil.location;
+  const shelf = spil.shelf ?? "-";
+  const available = spil.available ? "✅ Tilgængelig" : "❌ Udlånt";
 
   const html = `
    <article class="spil-card" tabindex="0">
@@ -590,23 +603,19 @@ function renderSpilCard(spil, container) {
           class="spil-poster"
           alt="Poster ${escapeHtml(title)}">
      <div class="spil-info">
-     <div class="spil-header">
-       <h3 class="spil-title">${escapeHtml(title)}</h3>
-       <div class="spil-rating-wrapper">
-         <span class="spil-rating">${escapeHtml(rating)}</span>
-         <img src="img/stjerne.svg" alt="Stjerne" class="stjerne-icon">
+       <div class="title-rating-container">
+         <h3>${escapeHtml(title)}</h3>
+         <span class="spil-rating"><img src="img/stjerne.svg" alt="rating" class="rating-star">${escapeHtml(
+           rating
+         )}</span>
        </div>
+ <p><strong>Lokation:</strong> ${escapeHtml(location)}</p>
+       <p><strong>Hylde:</strong> ${escapeHtml(shelf)}</p>
+       <p><strong>Status:</strong> ${available}</p>
+       <p class="description">${escapeHtml(desc)}</p>
+       <button class="details-btn" type="button">Læs mere</button>
      </div>
-
-
-     <p><strong>Genre:</strong> ${escapeHtml(genreLabel)}</p>
-     <p><strong>Spilletid:</strong> ${escapeHtml(playtime)}</p>
-     <p><strong>Spillere:</strong> ${playerText}</p>
-     <p class="description">${escapeHtml(desc)}</p>
-     <button class="details-btn" type="button">Læs mere</button>
-   </div>
- </article>
-
+   </article>
  `;
 
   container.insertAdjacentHTML("beforeend", html);
@@ -648,62 +657,99 @@ function renderSpilCard(spil, container) {
 
 function showSpilModal(spil) {
   const dialog = document.querySelector("#spil-dialog");
-  const content = dialog.querySelector("#dialog-content");
+  const content = document.querySelector("#dialog-content");
+  if (!dialog || !content) return;
 
-  // Byg HTML til modal
-  let playerText = "Ukendt";
+  const imageHtml = spil.image
+    ? `<img src="${escapeHtml(spil.image)}" class="spil-poster">`
+    : "";
+  const genreText = Array.isArray(spil.genre)
+    ? spil.genre.join(", ")
+    : spil.genre
+    ? String(spil.genre)
+    : "-";
+
+  // Håndter players objekt
+  let playersText = "-";
   if (spil.players) {
-    if (typeof spil.players === "object") {
-      const min = spil.players.min || spil.players.minimum || "";
-      const max = spil.players.max || spil.players.maximum || "";
-      if (min && max && min !== max) {
-        playerText = `${min}–${max}`;
-      } else if (min) {
-        playerText = `${min}`;
-      }
-    } else {
-      playerText = spil.players;
+    if (
+      typeof spil.players === "object" &&
+      spil.players.min &&
+      spil.players.max
+    ) {
+      playersText = `${spil.players.min}-${spil.players.max} spillere`;
+    } else if (
+      typeof spil.players === "string" ||
+      typeof spil.players === "number"
+    ) {
+      playersText = `${spil.players} spillere`;
     }
+  }
 
+  const rating = spil.rating ? `⭐ ${spil.rating}/5` : "Ingen rating";
+  const playtime = spil.playtime ? `${spil.playtime} min` : "-";
+  const age = spil.age ? `${spil.age}+` : "-";
+  const difficulty = spil.difficulty ?? "-";
+  const language = spil.language ?? "-";
+
+  // Fang lokation fra JSON
+  const location =
+    spil.location ||
+    spil.store ||
+    spil.place ||
+    (spil.library && spil.library.location) ||
+    "Ukendt lokation";
+
+  console.log("Location for", spil.title, ":", location, "Raw:", spil.location);
+
+  const shelf = spil.shelf ?? "-";
+  const available = spil.available ? "✅ Tilgængelig" : "❌ Udlånt";
+  const rules = spil.rules ?? "";
+
+  content.innerHTML = `
+   <div class="dialog-left">
+     <h2>${escapeHtml(spil.title ?? spil.name ?? "Untitled")}</h2>
+     <p class="rating">${rating}</p>
+     <p><strong>📝 Beskrivelse:</strong><br>${escapeHtml(
+       spil.description ?? "Ingen beskrivelse tilgængelig"
+     )}</p>
+     
+     <div class="info-grid">
+       <p><strong>🎭 Genre:</strong> ${escapeHtml(genreText)}</p>
+       <p><strong>👥 Spillere:</strong> ${escapeHtml(playersText)}</p>
+       <p><strong>⏱️ Spilletid:</strong> ${escapeHtml(playtime)}</p>
+       <p><strong>🎯 Sværhedsgrad:</strong> ${escapeHtml(difficulty)}</p>
+       <p><strong>👶 Alder:</strong> ${escapeHtml(age)}</p>
+       <p><strong>🌍 Sprog:</strong> ${escapeHtml(language)}</p>
+       <p><strong>📍 Lokation:</strong> ${escapeHtml(location)}</p>
+       <p><strong>📚 Hylde:</strong> ${escapeHtml(shelf)}</p>
+       <p><strong>Status:</strong> ${available}</p>
+     </div>
+   </div>
+   
+   <div class="dialog-right">
+     ${imageHtml}
+     ${
+       rules
+         ? `
+       <div class="rules-section">
+         <p><strong>📖 Regler:</strong></p>
+         <p class="rules-text">${escapeHtml(rules)}</p>
+       </div>
+     `
+         : ""
+     }
+   </div>
+ `;
+  const closeBtn = dialog.querySelector("#close-dialog");
+  if (closeBtn) {
+    closeBtn.replaceWith(closeBtn.cloneNode(true));
     dialog
       .querySelector("#close-dialog")
       .addEventListener("click", () => dialog.close(), { once: true });
   }
-  // Dynamisk udskriv ALLE felter fra JSON
-  let extraInfo = "";
-  for (const [key, value] of Object.entries(spil)) {
-    if (
-      [
-        "title",
-        "image",
-        "desc",
-        "players",
-        "rating",
-        "genreLabel",
-        "playtime",
-      ].includes(key)
-    )
-      continue; // disse vises særskilt nedenfor
-    extraInfo += `<p><strong>${key}:</strong> ${escapeHtml(String(value))}</p>`;
-  }
-
-  // Indsæt HTML i modal
-  content.innerHTML = `
-   <img src="${escapeHtml(spil.image)}" alt="${escapeHtml(
-    spil.title
-  )}" style="width:100%;max-width:400px;border-radius:10px;">
-   <div>
-     <h2>${escapeHtml(spil.title)}</h2>
-     <p><strong>Rating:</strong> ${escapeHtml(spil.rating)}</p>
-     <p><strong>Genre:</strong> ${escapeHtml(spil.genreLabel)}</p>
-     <p><strong>Spilletid:</strong> ${escapeHtml(spil.playtime)}</p>
-     <p><strong>Spillere:</strong> ${playerText}</p>
-     <p><strong>Beskrivelse:</strong> ${escapeHtml(spil.desc)}</p>
-     ${extraInfo}
-   </div>
- `;
-
-  dialog.showModal();
+  if (typeof dialog.showModal === "function") dialog.showModal();
+  else dialog.setAttribute("open", "");
 }
 
 /* ---------- Utilities ---------- */
